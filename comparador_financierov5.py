@@ -150,3 +150,4 @@ with tab4:
         st.download_button("📥 Descargar datos", data.to_csv().encode(), file_name="datos.csv", mime="text/csv")
         git init
         st.subheader("🔗 Correlaciones") 
+        Subo código principal FinAnalyzer EDU
