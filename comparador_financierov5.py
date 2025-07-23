@@ -39,7 +39,8 @@ data = yf.download(tickers, start=start_date, end=end_date)['Close'].dropna()
 returns = data.pct_change().dropna()
 
 # 📊 Pestañas
-tab1, tab2, tab3, tab4 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico"])
+
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico", "📘 Explicaciones"])
 
 # 📈 Precios
 with tab1:
