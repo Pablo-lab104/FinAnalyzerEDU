@@ -4,7 +4,7 @@ import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
 
-# 🎨 Configuración general
+# 🔧 Configuración general
 st.set_page_config(layout="wide", page_title="FinAnalyzer EDU", page_icon="📊")
 
 # 🖼 Encabezado institucional
@@ -16,42 +16,43 @@ st.markdown("""
     <p style='font-style: italic; color:#888;'>Analiza con precisión. Aprende con propósito.</p>
 </div>
 """, unsafe_allow_html=True)
-st.divider()
+st.markdown("<hr style='border-top: 1px solid #BBB;'>", unsafe_allow_html=True)
 
-# 📥 Inputs en columnas
-col1, col2, col3 = st.columns([3,2,2])
+# 🎛 Inputs organizados
+col1, col2, col3 = st.columns([3, 2, 2])
 with col1:
     tickers = st.text_input("📎 Tickers (ej: AAPL,MSFT,SPY)", "AAPL,MSFT,SPY").upper().replace(" ", "").split(",")
 with col2:
-    start_date = st.date_input("📅 Inicio", pd.to_datetime("2020-01-01"))
+    start_date = st.date_input("📅 Fecha de inicio", pd.to_datetime("2020-01-01"))
 with col3:
-    end_date = st.date_input("📅 Fin", pd.to_datetime("2027-01-01"))
+    end_date = st.date_input("📅 Fecha de fin", pd.to_datetime("2027-01-01"))
 
-# 🎨 Tema visual
-theme = st.selectbox("🎨 Tema", ["Claro", "Oscuro"])
+theme = st.selectbox("🎨 Tema visual", ["Claro", "Oscuro"])
 plotly_theme = "plotly_white" if theme == "Claro" else "plotly_dark"
 colors = px.colors.qualitative.Set1
 
 if "SPY" not in tickers:
     tickers.append("SPY")
 
+# 📉 Descarga de datos
 data = yf.download(tickers, start=start_date, end=end_date)['Close'].dropna()
 returns = data.pct_change().dropna()
 
-# 📊 Pestañas
-
+# 📊 Pestañas organizadas
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico", "📘 Explicaciones"])
 
-# 📈 Precios
+# 📈 TAB 1 - Precios históricos
 with tab1:
+    st.markdown("## 📈 Evolución histórica de precios")
     fig = go.Figure()
     for i, t in enumerate(tickers):
         fig.add_trace(go.Scatter(x=data.index, y=data[t], name=t, line=dict(color=colors[i % len(colors)])))
     fig.update_layout(template=plotly_theme, hovermode="x unified")
     st.plotly_chart(fig, use_container_width=True)
 
-# 📚 Fundamentales
+# 📚 TAB 2 - Fundamentales
 with tab2:
+    st.markdown("## 📚 Información fundamental")
     fundamentals = {}
     for t in tickers:
         info = yf.Ticker(t).info
@@ -69,8 +70,9 @@ with tab2:
     fig = px.bar(df.reset_index(), x="index", y=metric, color="index", template=plotly_theme)
     st.plotly_chart(fig, use_container_width=True)
 
-# 📊 Métricas
+# 📊 TAB 3 - Métricas financieras
 with tab3:
+    st.markdown("## 📊 Métricas de rendimiento")
     annual_return = ((data.iloc[-1] / data.iloc[0]) ** (1 / ((data.index[-1] - data.index[0]).days / 365.25)) - 1) * 100
     volatility = returns.std() * (252**0.5) * 100
     sharpe = annual_return / volatility
@@ -81,26 +83,15 @@ with tab3:
         if sharpe[t] > 2:
             st.warning(f"🚨 `{t}` tiene Sharpe Ratio alto ({sharpe[t]:.2f})")
 
-    with st.expander("ℹ️ Rendimiento anualizado"):
-        st.write("Es el crecimiento medio anual del activo en el periodo analizado.")
     st.plotly_chart(px.bar(x=annual_return.index, y=annual_return.values, color=annual_return.index, template=plotly_theme), use_container_width=True)
-
-    with st.expander("ℹ️ Volatilidad"):
-        st.write("Mide cuánto varía el precio. Alta volatilidad = más riesgo.")
     st.plotly_chart(px.bar(x=volatility.index, y=volatility.values, color=volatility.index, template=plotly_theme), use_container_width=True)
-
-    with st.expander("ℹ️ Sharpe Ratio"):
-        st.write("Mide el retorno ajustado al riesgo. >1 suele indicar buen rendimiento.")
     st.plotly_chart(px.bar(x=sharpe.index, y=sharpe.values, color=sharpe.index, template=plotly_theme), use_container_width=True)
-
-    with st.expander("ℹ️ Máximo Drawdown"):
-        st.write("Máxima caída desde el valor más alto en el periodo.")
     st.plotly_chart(px.bar(x=drawdown.index, y=drawdown.values, color=drawdown.index, template=plotly_theme), use_container_width=True)
 
     st.subheader("🔗 Correlación entre activos")
     st.dataframe(returns.corr())
 
-# 📉 Indicadores técnicos
+# 📉 TAB 4 - Indicadores técnicos
 def compute_rsi(series, period=14):
     delta = series.diff()
     gain = delta.where(delta > 0, 0)
@@ -118,6 +109,7 @@ def compute_macd(series, fast=12, slow=26, signal=9):
     return macd_line, signal_line
 
 with tab4:
+    st.markdown("## 📉 Análisis técnico")
     t = st.selectbox("🧭 Selecciona activo técnico", tickers)
     td = data[t].dropna()
     sma_20 = td.rolling(20).mean()
@@ -128,7 +120,6 @@ with tab4:
     upper = sma_20 + 2 * std
     lower = sma_20 - 2 * std
 
-    st.subheader("📊 Medias móviles")
     fig_sma = go.Figure()
     fig_sma.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
     fig_sma.add_trace(go.Scatter(x=sma_20.index, y=sma_20, name="SMA 20"))
@@ -136,63 +127,33 @@ with tab4:
     fig_sma.update_layout(template=plotly_theme)
     st.plotly_chart(fig_sma, use_container_width=True)
 
-    with st.expander("ℹ️ ¿Qué es RSI?"):
-        st.write("Mide fuerza relativa del precio. >70 sobrecomprado, <30 sobrevendido.")
     st.line_chart(rsi, use_container_width=True)
 
-    with st.expander("ℹ️ ¿Qué es MACD?"):
-        st.write("Cruces de medias móviles para detectar cambios de tendencia.")
     fig_macd = go.Figure()
     fig_macd.add_trace(go.Scatter(x=macd.index, y=macd, name="MACD"))
     fig_macd.add_trace(go.Scatter(x=signal.index, y=signal, name="Señal"))
     fig_macd.update_layout(template=plotly_theme)
     st.plotly_chart(fig_macd, use_container_width=True)
-st.subheader("📉 Bandas de Bollinger")
-std = td.rolling(20).std()
-upper = sma_20 + 2 * std
-lower = sma_20 - 2 * std
 
-fig_boll = go.Figure()
-fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
-fig_boll.add_trace(go.Scatter(x=upper.index, y=upper, name="Banda superior"))
-fig_boll.add_trace(go.Scatter(x=lower.index, y=lower, name="Banda inferior"))
-fig_boll.update_layout(template=plotly_theme, title="Bandas de Bollinger")
-st.plotly_chart(fig_boll, use_container_width=True)
+    fig_boll = go.Figure()
+    fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
+    fig_boll.add_trace(go.Scatter(x=upper.index, y=upper, name="Banda superior"))
+    fig_boll.add_trace(go.Scatter(x=lower.index, y=lower, name="Banda inferior"))
+    fig_boll.update_layout(template=plotly_theme)
+    st.plotly_chart(fig_boll, use_container_width=True)
 
-with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
-    st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
-    
-# ✅ Añade nueva pestaña de explicaciones
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico", "📘 Explicaciones"])
+    st.download_button("📥 Descargar datos", data.to_csv().encode(), file_name="datos.csv", mime="text/csv")
 
+# 📘 TAB 5 - Explicaciones
 with tab5:
     st.markdown("## 📘 Análisis y conclusiones")
 
     st.markdown("### 📈 Precios históricos")
-    st.write("Este gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas pueden indicar crecimiento estructural, mientras que caídas bruscas reflejan eventos puntuales o correcciones.")
+    st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas reflejan crecimiento estructural; caídas bruscas indican correcciones o eventos externos.")
 
     st.markdown("### 📚 Indicadores fundamentales")
-    st.write("- **PER <15:** Valoración razonable o potencial infravaloración.")
-    st.write("- **ROE >15%:** Gestión eficiente del capital."
-             " Empresas rentables suelen mantener ROE altos.")
-    st.write("- **Margen elevado:** Indica ventaja competitiva y control de costes.")
+    st.write("- **PER <15:** valoración razonable o infravalorada.")
 
-    st.markdown("### 📊 Métricas de rendimiento")
-    st.write(f"✅ **Mejor rendimiento anualizado:** `{annual_return.idxmax()}` con {annual_return.max():.2f}%")
-    st.write("- **Volatilidad:** Mide la dispersión de precios. Alta = riesgo, pero también oportunidades.")
-    st.write("- **Sharpe Ratio >2:** Buen rendimiento ajustado al riesgo.")
-    st.write("- **Drawdown:** Ayuda a evaluar pérdida máxima histórica. Clave en gestión de riesgo.")
-
-    st.markdown("### 📉 Indicadores técnicos")
-    st.write("- **SMA 20/50:** Identifican tendencia de corto/medio plazo.")
-    st.write("- **RSI >70:** Activo sobrecomprado. <30 = sobrevendido.")
-    st.write("- **MACD:** Señala posibles cambios de tendencia mediante cruces."
-             " Útil para validación de entradas/salidas.")
-    st.write("- **Bandas de Bollinger:** Muestran volatilidad. Expansión indica posible ruptura; contracción sugiere consolidación.")
-
-    st.markdown("---")
-    st.markdown("📘 Este apartado ofrece interpretación educativa para estudiantes y analistas."
-                " Los resultados deben contextualizarse según el entorno del mercado, objetivo de inversión y horizonte temporal.")
 
 
   
