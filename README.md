@@ -1,23 +1,27 @@
 # 📊 FinAnalyzer EDU — Comparador Financiero Educativo
 
-FinAnalyzer EDU es una aplicación interactiva desarrollada con fines pedagógicos, diseñada para analizar y comparar activos financieros mediante indicadores técnicos y fundamentos clave.  
-Perfecta para estudiantes, docentes y entusiastas de la educación financiera.
+FinAnalyzer EDU es una aplicación interactiva creada con fines pedagógicos, que permite analizar activos bursátiles mediante indicadores técnicos y visualización gráfica.
 
 ---
 
-## 🎓 Objetivos del proyecto
+## 🎯 ¿Qué incluye?
 
-- Crear una herramienta visual accesible y profesional
-- Fomentar el aprendizaje práctico de análisis bursátil
-- Facilitar comparaciones multi-activo con enfoque docente
+- ✅ Comparación de múltiples activos financieros
+- ✅ Análisis técnico: RSI, MACD, Bandas de Bollinger, SMA/EMA
+- ✅ Explicaciones educativas debajo de cada gráfico
+- ✅ Exportación de datos en CSV
+- ✅ Tema Claro/Oscuro
+- ✅ Firma institucional y propósito docente
 
 ---
 
-## ⚙️ ¿Qué incluye la app?
+## 🚀 Acceso online
 
-✔️ Ingreso libre de múltiples activos (ejemplo: AAPL, MSFT, SPY)  
-✔️ Visualización de precios históricos en gráficos interactivos  
-✔️ Análisis técnico opcional: RSI, MACD, Bandas de Bollinger, medias móviles  
-✔️ Exportación de datos en CSV  
-✔️ Explicaciones educativas y glosario financiero  
-✔️ Tema claro / oscuro personalizable
+👉 App pública: [finanalyzeredu.streamlit.app](https://pablo-lab104-finanalyzeredu-comparador-financierov5-3x9d96.streamlit.app)
+
+---
+
+## 👨‍🏫 Autor
+
+**Pablo Serrano Ruiz**  
+*Analiza con precisión. Aprende con propósito.*  
