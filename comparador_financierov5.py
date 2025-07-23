@@ -162,31 +162,37 @@ st.plotly_chart(fig_boll, use_container_width=True)
 with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
     st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
     
-  with tab5:
-    st.markdown("## 📘 Análisis y conclusiones")
-    st.markdown("### 📈 Precios históricos")
-    st.write("Aquí explicas qué representa el gráfico de precios...")
+# ✅ Añade nueva pestaña de explicaciones
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico", "📘 Explicaciones"])
 
+with tab5:
+    st.markdown("## 📘 Análisis y conclusiones")
+
+    st.markdown("### 📈 Precios históricos")
+    st.write("Este gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas pueden indicar crecimiento estructural, mientras que caídas bruscas reflejan eventos puntuales o correcciones.")
 
     st.markdown("### 📚 Indicadores fundamentales")
-    st.write("- **PER bajo (<15)** sugiere valoración razonable o infravalorada.")
-    st.write("- **ROE alto (>15%)** indica eficiencia en el uso del capital.")
-    st.write("- **Margen elevado** sugiere fortaleza competitiva.")
+    st.write("- **PER <15:** Valoración razonable o potencial infravaloración.")
+    st.write("- **ROE >15%:** Gestión eficiente del capital."
+             " Empresas rentables suelen mantener ROE altos.")
+    st.write("- **Margen elevado:** Indica ventaja competitiva y control de costes.")
 
     st.markdown("### 📊 Métricas de rendimiento")
     st.write(f"✅ **Mejor rendimiento anualizado:** `{annual_return.idxmax()}` con {annual_return.max():.2f}%")
-    st.write("- **Volatilidad alta** implica mayor riesgo y oportunidades.")
-    st.write("- **Sharpe >2** indica retorno eficiente respecto al riesgo.")
-    st.write("- **Drawdown profundo** alerta sobre caídas históricas significativas.")
+    st.write("- **Volatilidad:** Mide la dispersión de precios. Alta = riesgo, pero también oportunidades.")
+    st.write("- **Sharpe Ratio >2:** Buen rendimiento ajustado al riesgo.")
+    st.write("- **Drawdown:** Ayuda a evaluar pérdida máxima histórica. Clave en gestión de riesgo.")
 
     st.markdown("### 📉 Indicadores técnicos")
-    st.write("- **SMA 20/50** revelan tendencias de corto/medio plazo.")
-    st.write("- **RSI >70 = sobrecompra; <30 = sobreventa.**")
-    st.write("- **MACD** anticipa cambios de tendencia.")
-    st.write("- **Bandas de Bollinger** reflejan fases de volatilidad.")
+    st.write("- **SMA 20/50:** Identifican tendencia de corto/medio plazo.")
+    st.write("- **RSI >70:** Activo sobrecomprado. <30 = sobrevendido.")
+    st.write("- **MACD:** Señala posibles cambios de tendencia mediante cruces."
+             " Útil para validación de entradas/salidas.")
+    st.write("- **Bandas de Bollinger:** Muestran volatilidad. Expansión indica posible ruptura; contracción sugiere consolidación.")
 
     st.markdown("---")
-    st.markdown("📘 Este apartado ofrece interpretación educativa para alumnos y analistas. Los resultados deben contextualizarse según objetivos, entorno de mercado y horizonte temporal.")
+    st.markdown("📘 Este apartado ofrece interpretación educativa para estudiantes y analistas."
+                " Los resultados deben contextualizarse según el entorno del mercado, objetivo de inversión y horizonte temporal.")
 
 
   
