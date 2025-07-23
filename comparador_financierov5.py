@@ -146,12 +146,22 @@ with tab4:
     fig_macd.add_trace(go.Scatter(x=signal.index, y=signal, name="Señal"))
     fig_macd.update_layout(template=plotly_theme)
     st.plotly_chart(fig_macd, use_container_width=True)
+st.subheader("📉 Bandas de Bollinger")
+std = td.rolling(20).std()
+upper = sma_20 + 2 * std
+lower = sma_20 - 2 * std
 
-    st.subheader("📉 Bandas de Bollinger")
-    fig_boll = go.Figure()
-    fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
+fig_boll = go.Figure()
+fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
 fig_boll.add_trace(go.Scatter(x=upper.index, y=upper, name="Banda superior"))
 fig_boll.add_trace(go.Scatter(x=lower.index, y=lower, name="Banda inferior"))
+fig_boll.update_layout(template=plotly_theme, title="Bandas de Bollinger")
+st.plotly_chart(fig_boll, use_container_width=True)
+
+with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
+    st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
+
+  
 
  
         
