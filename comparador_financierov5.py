@@ -149,4 +149,4 @@ with tab4:
             st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
         st.download_button("📥 Descargar datos", data.to_csv().encode(), file_name="datos.csv", mime="text/csv")
         st.subheader("🔗 Correlaciones") 
-        Subo código principal FinAnalyzer EDU
+        
