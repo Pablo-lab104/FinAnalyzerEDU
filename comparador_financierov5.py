@@ -152,7 +152,6 @@ with tab4:
         with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
             st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
         st.download_button("📥 Descargar datos", data.to_csv().encode(), file_name="datos.csv", mime="text/csv")
-        git init
         st.subheader("🔗 Correlaciones") 
  
         
