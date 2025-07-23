@@ -4,54 +4,53 @@ import plotly.graph_objects as go
 import pandas as pd
 from datetime import date
 
-# 🎨 Configuración general
+# 🎨 Configuración
 st.set_page_config(page_title="FinAnalyzer EDU", layout="wide")
 st.title("📊 FinAnalyzer EDU — Comparador Financiero Educativo")
 
 # 🖼 Imagen institucional
 st.image("portada_finanalyzer.png", use_container_width=True)
-
 st.markdown("_Analiza con precisión. Aprende con propósito._")
 st.markdown("---")
 
 # 📥 Entrada de datos
-tickers = st.text_input("📎 Introduce símbolos de activos (ej: AAPL,MSFT)", "AAPL,MSFT")
-start_date = st.date_input("📅 Fecha de inicio", date(2020, 1, 1))
-end_date = st.date_input("📅 Fecha de fin", date(2027, 1, 1))
+tickers = st.text_input("📎 Activos (ej: AAPL, MSFT)", "AAPL,MSFT")
+start = st.date_input("📅 Fecha inicio", date(2020,1,1))
+end = st.date_input("📅 Fecha fin", date(2027,1,1))
 selected = tickers.replace(" ", "").split(",")
 
 col1, col2 = st.columns(2)
 with col1:
-    theme = st.radio("🎨 Tema de gráficos", ["Claro", "Oscuro"])
-    template = "plotly_white" if theme == "Claro" else "plotly_dark"
+    theme = st.radio("🎨 Tema", ["Claro", "Oscuro"])
+    template = "plotly_white" if theme=="Claro" else "plotly_dark"
 with col2:
-    show_tech = st.checkbox("📊 Mostrar análisis técnico")
+    show_tech = st.checkbox("📊 Análisis técnico")
 
 # 📡 Descarga de datos
 data = {}
-for ticker in selected:
-    df = yf.download(ticker, start=start_date, end=end_date)
-    df["Ticker"] = ticker
-    data[ticker] = df
+for t in selected:
+    df = yf.download(t, start=start, end=end)
+    df["Ticker"] = t
+    data[t] = df
 
 st.markdown("---")
-st.subheader("📈 Evolución histórica de precios")
+st.subheader("📈 Evolución histórica")
 
-for ticker in selected:
-    df = data[ticker]
+for t in selected:
+    df = data[t]
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df.index, y=df["Close"], name=ticker))
-    fig.update_layout(template=template, title=f"Precio histórico — {ticker}")
-    st.plotly_chart(fig, use_container_width=True, key=f"price_{ticker}")
-    st.markdown(f"ℹ️ **{ticker}**: Este gráfico muestra el precio de cierre diario. Observa tendencias, picos y valles.")
+    fig.add_trace(go.Scatter(x=df.index, y=df["Close"], name=t))
+    fig.update_layout(template=template, title=f"Precio — {t}")
+    st.plotly_chart(fig, use_container_width=True, key=f"precio_{t}")
+    st.markdown(f"ℹ️ **{t}**: Precio de cierre diario. Observa la tendencia y movimientos clave.")
 
-# 📊 Indicadores técnicos
+# 🧪 Indicadores técnicos
 if show_tech:
     st.markdown("---")
     st.subheader("🧪 Indicadores técnicos")
 
-    for ticker in selected:
-        df = data[ticker].copy()
+    for t in selected:
+        df = data[t].copy()
         df["SMA20"] = df["Close"].rolling(20).mean()
         df["SMA50"] = df["Close"].rolling(50).mean()
         df["EMA12"] = df["Close"].ewm(span=12).mean()
@@ -60,58 +59,60 @@ if show_tech:
         df["Signal"] = df["MACD"].ewm(span=9).mean()
         df["RSI"] = 100 - (100 / (1 + df["Close"].pct_change().rolling(14).mean()))
         std = df["Close"].rolling(20).std()
-        df["Upper"] = df["SMA20"] + 2 * std
-        df["Lower"] = df["SMA20"] - 2 * std
+        boll_mean = df["Close"].rolling(20).mean()
+        df["Upper"] = boll_mean + 2 * std
+        df["Lower"] = boll_mean - 2 * std
 
-        st.markdown(f"### 📌 {ticker}")
+        st.markdown(f"### 📌 {t}")
 
         # SMA
         fig_sma = go.Figure()
         fig_sma.add_trace(go.Scatter(x=df.index, y=df["Close"], name="Precio"))
         fig_sma.add_trace(go.Scatter(x=df.index, y=df["SMA20"], name="SMA20"))
         fig_sma.add_trace(go.Scatter(x=df.index, y=df["SMA50"], name="SMA50"))
-        fig_sma.update_layout(template=template, title="Media móvil simple")
-        st.plotly_chart(fig_sma, use_container_width=True, key=f"sma_{ticker}")
-        st.markdown("📏 **SMA**: Muestra la tendencia suavizada del precio. SMA20 refleja corto plazo; SMA50, medio plazo.")
+        fig_sma.update_layout(template=template, title="Media móvil")
+        st.plotly_chart(fig_sma, use_container_width=True, key=f"sma_{t}")
+        st.markdown("📏 **SMA**: La media móvil suaviza el precio para ver tendencias.")
 
         # RSI
         fig_rsi = go.Figure()
         fig_rsi.add_trace(go.Scatter(x=df.index, y=df["RSI"], name="RSI"))
-        fig_rsi.update_layout(template=template, title="Índice de Fuerza Relativa (RSI)")
-        st.plotly_chart(fig_rsi, use_container_width=True, key=f"rsi_{ticker}")
-        st.markdown("🧪 **RSI**: Detecta zonas de sobrecompra (>70) o sobreventa (<30). Útil para anticipar giros.")
+        fig_rsi.update_layout(template=template, title="RSI")
+        st.plotly_chart(fig_rsi, use_container_width=True, key=f"rsi_{t}")
+        st.markdown("🧪 **RSI**: Identifica zonas de sobrecompra/sobreventa para posibles giros.")
 
         # MACD
         fig_macd = go.Figure()
         fig_macd.add_trace(go.Scatter(x=df.index, y=df["MACD"], name="MACD"))
         fig_macd.add_trace(go.Scatter(x=df.index, y=df["Signal"], name="Señal"))
         fig_macd.update_layout(template=template, title="MACD")
-        st.plotly_chart(fig_macd, use_container_width=True, key=f"macd_{ticker}")
-        st.markdown("📈 **MACD**: Mide la fuerza y dirección del movimiento. Cruces con la Señal pueden indicar entradas/salidas.")
+        st.plotly_chart(fig_macd, use_container_width=True, key=f"macd_{t}")
+        st.markdown("📈 **MACD**: Mide el impulso. Cruces entre líneas indican señales técnicas.")
 
-        # Bandas de Bollinger
+        # Bollinger
         fig_boll = go.Figure()
         fig_boll.add_trace(go.Scatter(x=df.index, y=df["Close"], name="Precio"))
         fig_boll.add_trace(go.Scatter(x=df.index, y=df["Upper"], name="Banda superior"))
         fig_boll.add_trace(go.Scatter(x=df.index, y=df["Lower"], name="Banda inferior"))
         fig_boll.update_layout(template=template, title="Bandas de Bollinger")
-        st.plotly_chart(fig_boll, use_container_width=True, key=f"boll_{ticker}")
-        st.markdown("📊 **Bollinger**: Ayudan a identificar zonas de volatilidad. Tocando los bordes puede anunciar corrección.")
+        st.plotly_chart(fig_boll, use_container_width=True, key=f"boll_{t}")
+        st.markdown("📊 **Bollinger**: Visualizan zonas de alta volatilidad. Los extremos sugieren corrección.")
 
-# 📤 Exportar CSV
+# 📤 Exportación
 st.markdown("---")
 st.subheader("📤 Exportar datos")
-if st.button("Descargar CSV combinado"):
-    final_df = pd.concat(data.values())
-    csv = final_df.to_csv(index=False).encode("utf-8")
-    st.download_button("📎 Haz clic para bajar datos", data=csv, file_name="finanalyzer_edu.csv")
+if st.button("Descargar CSV"):
+    all_data = pd.concat(data.values())
+    csv = all_data.to_csv(index=False).encode("utf-8")
+    st.download_button("⬇️ Descargar CSV", data=csv, file_name="FinAnalyzerEDU.csv")
 
-# 📘 Footer institucional
+# 📘 Firma institucional
 st.markdown("---")
 st.markdown("""
-📘 **FinAnalyzer EDU** ha sido desarrollado por *Pablo Serrano Ruiz* con fines educativos y académicos.  
+📘 **FinAnalyzer EDU** desarrollado por *Pablo Serrano Ruiz* con fines educativos y académicos.  
 _"Analiza con precisión. Aprende con propósito."_
 """)
+
 
  
         
