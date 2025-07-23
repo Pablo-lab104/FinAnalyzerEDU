@@ -161,14 +161,12 @@ st.plotly_chart(fig_boll, use_container_width=True)
 
 with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
     st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
-with tab5:
+    
+  with tab5:
     st.markdown("## 📘 Análisis y conclusiones")
-    # (Y el resto de tus explicaciones aquí, también indentadas)
-
-    st.markdown("## 📘 Análisis y conclusiones")
-
     st.markdown("### 📈 Precios históricos")
-    st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias ascendentes sostenidas pueden indicar buen desempeño empresarial, mientras que correcciones abruptas podrían estar asociadas a eventos macroeconómicos o reportes negativos.")
+    st.write("Aquí explicas qué representa el gráfico de precios...")
+
 
     st.markdown("### 📚 Indicadores fundamentales")
     st.write("- **PER bajo (<15)** sugiere valoración razonable o infravalorada.")
