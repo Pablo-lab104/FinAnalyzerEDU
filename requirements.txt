@@ -2,4 +2,3 @@ streamlit
 yfinance
 pandas
 plotly
-Añadir dependencias para despliegue en Streamlit
