@@ -161,6 +161,32 @@ st.plotly_chart(fig_boll, use_container_width=True)
 
 with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
     st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
+    with tab5:
+    st.markdown("## 📘 Análisis y conclusiones")
+
+    st.markdown("### 📈 Precios históricos")
+    st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias ascendentes sostenidas pueden indicar buen desempeño empresarial, mientras que correcciones abruptas podrían estar asociadas a eventos macroeconómicos o reportes negativos.")
+
+    st.markdown("### 📚 Indicadores fundamentales")
+    st.write("- **PER bajo (<15)** sugiere valoración razonable o infravalorada.")
+    st.write("- **ROE alto (>15%)** indica eficiencia en el uso del capital.")
+    st.write("- **Margen elevado** sugiere fortaleza competitiva.")
+
+    st.markdown("### 📊 Métricas de rendimiento")
+    st.write(f"✅ **Mejor rendimiento anualizado:** `{annual_return.idxmax()}` con {annual_return.max():.2f}%")
+    st.write("- **Volatilidad alta** implica mayor riesgo y oportunidades.")
+    st.write("- **Sharpe >2** indica retorno eficiente respecto al riesgo.")
+    st.write("- **Drawdown profundo** alerta sobre caídas históricas significativas.")
+
+    st.markdown("### 📉 Indicadores técnicos")
+    st.write("- **SMA 20/50** revelan tendencias de corto/medio plazo.")
+    st.write("- **RSI >70 = sobrecompra; <30 = sobreventa.**")
+    st.write("- **MACD** anticipa cambios de tendencia.")
+    st.write("- **Bandas de Bollinger** reflejan fases de volatilidad.")
+
+    st.markdown("---")
+    st.markdown("📘 Este apartado ofrece interpretación educativa para alumnos y analistas. Los resultados deben contextualizarse según objetivos, entorno de mercado y horizonte temporal.")
+
 
   
 
