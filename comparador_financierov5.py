@@ -150,6 +150,8 @@ with tab4:
     st.subheader("📉 Bandas de Bollinger")
     fig_boll = go.Figure()
     fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
+fig_boll.add_trace(go.Scatter(x=upper.index, y=upper, name="Banda superior"))
+fig_boll.add_trace(go.Scatter(x=lower.index, y=lower, name="Banda inferior"))
 
  
         
