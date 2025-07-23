@@ -7,9 +7,13 @@ from datetime import date
 # 🎨 Configuración general
 st.set_page_config(page_title="FinAnalyzer EDU", layout="wide")
 st.title("📊 FinAnalyzer EDU — Comparador Financiero Educativo")
-st.markdown("_Analiza con precisión. Aprende con propósito._")
 
+# 🖼 Imagen institucional
+st.image("portada_finanalyzer.png", use_column_width=True)
+
+st.markdown("_Analiza con precisión. Aprende con propósito._")
 st.markdown("---")
+
 
 # 📥 Entrada de datos
 tickers = st.text_input("📎 Introduce los símbolos de los activos (ej: AAPL, MSFT):", "AAPL,MSFT")
