@@ -161,7 +161,10 @@ st.plotly_chart(fig_boll, use_container_width=True)
 
 with st.expander("ℹ️ ¿Qué son Bandas de Bollinger?"):
     st.write("Indican si el activo está sobrecomprado o sobrevendido según volatilidad.")
-    with tab5:
+with tab5:
+    st.markdown("## 📘 Análisis y conclusiones")
+    # (Y el resto de tus explicaciones aquí, también indentadas)
+
     st.markdown("## 📘 Análisis y conclusiones")
 
     st.markdown("### 📈 Precios históricos")
