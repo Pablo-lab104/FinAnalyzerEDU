@@ -1,3 +1,4 @@
+![FinAnalyzer EDU](portada_finanalyzer.png)
 # 📊 FinAnalyzer EDU — Comparador Financiero Educativo
 
 FinAnalyzer EDU es una aplicación interactiva creada con fines pedagógicos, que permite analizar activos bursátiles mediante indicadores técnicos y visualización gráfica.
