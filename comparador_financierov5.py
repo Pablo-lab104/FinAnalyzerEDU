@@ -41,7 +41,7 @@ activos = st.multiselect("Selecciona activos (ej: AAPL, MSFT, TSLA):", ['AAPL', 
 periodo = st.selectbox("Periodo:", ['3mo', '6mo', '1y', '2y'])
 intervalo = st.selectbox("Intervalo:", ['1d', '1wk'])
 
-# 🖼️ Visualización por activo
+# 📊 Visualización por activo
 for ticker in activos:
     df = yf.download(ticker, period=periodo, interval=intervalo)
     df['RSI'] = calcular_rsi(df)
@@ -82,7 +82,7 @@ if pregunta:
     respuesta = pregunta_gpt(pregunta)
     st.success(respuesta)
 
-# 🧑‍🏫 Créditos
+# 👤 Créditos
 st.markdown("---")
 st.caption("🧠 FinAnalyzer EDU es una herramienta didáctica creada por Pablo Serrano Ruiz. Visualiza con precisión, aprende con propósito.")
 
