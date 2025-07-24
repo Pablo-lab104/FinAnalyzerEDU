@@ -158,11 +158,12 @@ import openai
 openai.api_key = "TU_API_KEY"  # ← reemplaza con tu clave API
 
 def consulta_chatbot(pregunta):
-    respuesta = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": pregunta}]
-    )
-    return respuesta.choices[0].message.content
+    client = openai.OpenAI()  # si estás en v1
+chat_response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": pregunta}]
+)
+return chat_response.choices[0].message.content
 
 st.markdown("---")
 st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
