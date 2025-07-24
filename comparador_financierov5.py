@@ -148,9 +148,44 @@ with tab4:
 # 📘 TAB 5 - Explicaciones
 with tab5:
     st.markdown("## 📘 Análisis y conclusiones")
+
     st.markdown("### 📈 Precios históricos")
     st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas reflejan crecimiento estructural; caídas bruscas indican correcciones o eventos externos.")
-    st.markdown("### 📚 Indicadores
+
+    st.markdown("### 📚 Indicadores fundamentales")
+    st.write("""
+    **🔎 PER (Price-to-Earnings Ratio):** Mide cuántas veces el beneficio anual está incluido en el precio de la acción. Un PER bajo (<15) puede indicar que está infravalorada, aunque depende del sector.
+
+    **💰 Dividend Yield (%):** Representa el retorno anual que un inversor obtiene por los dividendos, respecto al precio de la acción. Ideal para perfiles conservadores que buscan ingresos pasivos.
+
+    **📈 ROE (Return on Equity):** Muestra qué tan eficientemente una empresa utiliza el dinero de los accionistas para generar beneficios. Un ROE alto (>15%) indica buena gestión y rentabilidad.
+
+    **📊 Margen neto (%):** Proporción de ingresos que queda como beneficio final. Un margen alto muestra eficiencia operativa y control de costes.
+
+    Estas métricas permiten comparar empresas en cuanto a rentabilidad, riesgo y potencial de crecimiento.
+    """)
+
+# 💬 Chat Educativo Financiero (GPT)
+client = openai.OpenAI(api_key="TU_API_KEY")  # ← Reemplaza con tu clave real
+
+def consulta_chatbot(pregunta):
+    chat_response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": pregunta}]
+    )
+    return chat_response.choices[0].message.content
+
+st.markdown("---")
+st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
+user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión:")
+
+if user_question:
+    try:
+        respuesta = consulta_chatbot(user_question)
+        st.info(respuesta)
+    except Exception:
+        st.error("❌ Ocurrió un error al conectar con el chatbot. Verifica tu clave API o conexión.")
+
 
 
 
