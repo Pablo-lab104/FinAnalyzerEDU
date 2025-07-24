@@ -172,11 +172,10 @@ user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión
 if user_question:
     respuesta = consulta_chatbot(user_question)
     st.info(respuesta)
-
 # 💬 Chat Educativo Financiero (GPT)
 import openai
 
-client = openai.OpenAI(api_key="TU_API_KEY")  # ← Reemplaza TU_API_KEY por tu clave real
+client = openai.OpenAI(api_key="TU_API_KEY")  # ← reemplaza TU_API_KEY por tu clave real
 
 def consulta_chatbot(pregunta):
     chat_response = client.chat.completions.create(
@@ -196,6 +195,7 @@ if user_question:
         st.info(respuesta)
     except Exception as e:
         st.error("❌ Ocurrió un error al conectar con el chatbot. Verifica tu clave API o conexión.")
+
 
 
 
