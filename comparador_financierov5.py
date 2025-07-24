@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
+import openai  # ← añadimos OpenAI al inicio
 
 # 🔧 Configuración general
 st.set_page_config(layout="wide", page_title="FinAnalyzer EDU", page_icon="📊")
@@ -147,54 +148,9 @@ with tab4:
 # 📘 TAB 5 - Explicaciones
 with tab5:
     st.markdown("## 📘 Análisis y conclusiones")
-
     st.markdown("### 📈 Precios históricos")
     st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas reflejan crecimiento estructural; caídas bruscas indican correcciones o eventos externos.")
-
-    st.markdown("### 📚 Indicadores fundamentales")
-    st.write("- **PER <15:** valoración razonable o infravalorada.")
-    # 💬 Chat Educativo Financiero (GPT)
-import openai
-openai.api_key = "TU_API_KEY"  # ← reemplaza con tu clave API
-
-def consulta_chatbot(pregunta):
-    client = openai.OpenAI()  # si estás en v1
-chat_response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": pregunta}]
-)
-return chat_response.choices[0].message.content
-
-st.markdown("---")
-st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
-user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión:")
-
-if user_question:
-    respuesta = consulta_chatbot(user_question)
-    st.info(respuesta)
-# 💬 Chat Educativo Financiero (GPT)
-import openai
-
-client = openai.OpenAI(api_key="TU_API_KEY")  # ← reemplaza TU_API_KEY por tu clave real
-
-def consulta_chatbot(pregunta):
-    chat_response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": pregunta}]
-    )
-    return chat_response.choices[0].message.content
-
-st.markdown("---")
-st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
-
-user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión:")
-
-if user_question:
-    try:
-        respuesta = consulta_chatbot(user_question)
-        st.info(respuesta)
-    except Exception as e:
-        st.error("❌ Ocurrió un error al conectar con el chatbot. Verifica tu clave API o conexión.")
+    st.markdown("### 📚 Indicadores
 
 
 
