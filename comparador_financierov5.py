@@ -153,6 +153,25 @@ with tab5:
 
     st.markdown("### 📚 Indicadores fundamentales")
     st.write("- **PER <15:** valoración razonable o infravalorada.")
+    # 💬 Chat Educativo Financiero (GPT)
+import openai
+openai.api_key = "TU_API_KEY"  # ← reemplaza con tu clave API
+
+def consulta_chatbot(pregunta):
+    respuesta = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": pregunta}]
+    )
+    return respuesta.choices[0].message.content
+
+st.markdown("---")
+st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
+user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión:")
+
+if user_question:
+    respuesta = consulta_chatbot(user_question)
+    st.info(respuesta)
+
 
 
 
