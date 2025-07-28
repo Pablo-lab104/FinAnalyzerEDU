@@ -3,23 +3,23 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
-import openai  # ← añadimos OpenAI al inicio
+import openai
 
-# 🔧 Configuración general
+# 🛠️ Configuración general
 st.set_page_config(layout="wide", page_title="FinAnalyzer EDU", page_icon="📊")
 
-# 🖼 Encabezado institucional
+# 🎨 Encabezado institucional
 st.markdown("""
 <div style='text-align: center'>
-    <h1 style='color:#174A7E;'>📊 FinAnalyzer EDU</h1>
-    <h3 style='color:#555;'>Comparador Financiero Educativo</h3>
-    <img src='https://raw.githubusercontent.com/Pablo-lab104/FinAnalyzerEDU/main/portada_finanalyzer.png' width='80%'>
-    <p style='font-style: italic; color:#888;'>Analiza con precisión. Aprende con propósito.</p>
+<h1 style='color:#174A7E;'>📊 FinAnalyzer EDU</h1>
+<h3 style='color:#555;'>Comparador Financiero Educativo</h3>
+<img src='https://raw.githubusercontent.com/Pablo-lab104/FinAnalyzerEDU/main/portada_finanalyzer.png' width='80%'>
+<p style='font-style: italic; color:#888;'>Analiza con precisión. Aprende con propósito.</p>
 </div>
 """, unsafe_allow_html=True)
 st.markdown("<hr style='border-top: 1px solid #BBB;'>", unsafe_allow_html=True)
 
-# 🎛 Inputs organizados
+# 🎯 Inputs principales
 col1, col2, col3 = st.columns([3, 2, 2])
 with col1:
     tickers = st.text_input("📎 Tickers (ej: AAPL,MSFT,SPY)", "AAPL,MSFT,SPY").upper().replace(" ", "").split(",")
@@ -35,14 +35,14 @@ colors = px.colors.qualitative.Set1
 if "SPY" not in tickers:
     tickers.append("SPY")
 
-# 📉 Descarga de datos
+# 📉 Descarga de precios históricos
 data = yf.download(tickers, start=start_date, end=end_date)['Close'].dropna()
 returns = data.pct_change().dropna()
 
-# 📊 Pestañas organizadas
+# 🧭 Tabs organizados
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Precios", "📚 Fundamentales", "📊 Métricas", "📉 Técnico", "📘 Explicaciones"])
 
-# 📈 TAB 1 - Precios históricos
+# 📈 TAB 1 - Evolución histórica
 with tab1:
     st.markdown("## 📈 Evolución histórica de precios")
     fig = go.Figure()
@@ -55,18 +55,30 @@ with tab1:
 with tab2:
     st.markdown("## 📚 Información fundamental")
     fundamentals = {}
+
     for t in tickers:
-        info = yf.Ticker(t).info
-        fundamentals[t] = {
-            "Nombre": info.get("longName"),
-            "PER": info.get("trailingPE"),
-            "Dividend (%)": info.get("dividendYield", 0) * 100 if info.get("dividendYield") else None,
-            "ROE (%)": info.get("returnOnEquity", 0) * 100 if info.get("returnOnEquity") else None,
-            "Margen (%)": info.get("profitMargins", 0) * 100 if info.get("profitMargins") else None
-        }
+        try:
+            info = yf.Ticker(t).fast_info
+            fundamentals[t] = {
+                "Nombre": t,
+                "Precio actual": info.get("last_price"),
+                "PER": info.get("pe_ratio"),
+                "Dividend (%)": info.get("dividend_rate") or None,
+                "ROE (%)": None,
+                "Margen (%)": None
+            }
+        except Exception:
+            fundamentals[t] = {
+                "Nombre": t,
+                "Precio actual": "Error",
+                "PER": "Error",
+                "Dividend (%)": "Error",
+                "ROE (%)": "Error",
+                "Margen (%)": "Error"
+            }
+
     df = pd.DataFrame(fundamentals).T
     st.dataframe(df)
-
     metric = st.selectbox("📊 Comparar métrica", df.columns[1:])
     fig = px.bar(df.reset_index(), x="index", y=metric, color="index", template=plotly_theme)
     st.plotly_chart(fig, use_container_width=True)
@@ -74,117 +86,60 @@ with tab2:
 # 📊 TAB 3 - Métricas financieras
 with tab3:
     st.markdown("## 📊 Métricas de rendimiento")
-    annual_return = ((data.iloc[-1] / data.iloc[0]) ** (1 / ((data.index[-1] - data.index[0]).days / 365.25)) - 1) * 100
-    volatility = returns.std() * (252**0.5) * 100
-    sharpe = annual_return / volatility
-    drawdown = ((data / data.cummax()) - 1).min() * 100
-
-    st.markdown(f"📋 **Mejor rendimiento:** `{annual_return.idxmax()}` con {annual_return.max():.2f}%")
-    for t in tickers:
-        if sharpe[t] > 2:
-            st.warning(f"🚨 `{t}` tiene Sharpe Ratio alto ({sharpe[t]:.2f})")
-
-    st.plotly_chart(px.bar(x=annual_return.index, y=annual_return.values, color=annual_return.index, template=plotly_theme), use_container_width=True)
-    st.plotly_chart(px.bar(x=volatility.index, y=volatility.values, color=volatility.index, template=plotly_theme), use_container_width=True)
-    st.plotly_chart(px.bar(x=sharpe.index, y=sharpe.values, color=sharpe.index, template=plotly_theme), use_container_width=True)
-    st.plotly_chart(px.bar(x=drawdown.index, y=drawdown.values, color=drawdown.index, template=plotly_theme), use_container_width=True)
-
-    st.subheader("🔗 Correlación entre activos")
-    st.dataframe(returns.corr())
+    sharpe_ratio = returns.mean() / returns.std()
+    volatilities = returns.std()
+    metrics_df = pd.DataFrame({
+        "Sharpe Ratio": sharpe_ratio,
+        "Volatilidad": volatilities,
+    }).dropna()
+    st.dataframe(metrics_df)
+    chart_type = st.selectbox("📊 Mostrar gráfico", ["Sharpe Ratio", "Volatilidad"])
+    fig = px.bar(metrics_df.reset_index(), x="index", y=chart_type, color="index", template=plotly_theme)
+    st.plotly_chart(fig, use_container_width=True)
 
 # 📉 TAB 4 - Indicadores técnicos
-def compute_rsi(series, period=14):
-    delta = series.diff()
-    gain = delta.where(delta > 0, 0)
-    loss = -delta.where(delta < 0, 0)
-    avg_gain = gain.rolling(period).mean()
-    avg_loss = loss.rolling(period).mean()
-    rs = avg_gain / avg_loss
-    return 100 - (100 / (1 + rs))
-
-def compute_macd(series, fast=12, slow=26, signal=9):
-    ema_fast = series.ewm(span=fast).mean()
-    ema_slow = series.ewm(span=slow).mean()
-    macd_line = ema_fast - ema_slow
-    signal_line = macd_line.ewm(span=signal).mean()
-    return macd_line, signal_line
-
 with tab4:
-    st.markdown("## 📉 Análisis técnico")
-    t = st.selectbox("🧭 Selecciona activo técnico", tickers)
-    td = data[t].dropna()
-    sma_20 = td.rolling(20).mean()
-    sma_50 = td.rolling(50).mean()
-    rsi = compute_rsi(td)
-    macd, signal = compute_macd(td)
-    std = td.rolling(20).std()
-    upper = sma_20 + 2 * std
-    lower = sma_20 - 2 * std
+    st.markdown("## 📉 Indicadores técnicos: RSI y medias móviles")
+    for t in tickers:
+        df = data[t].dropna()
+        df_ma50 = df.rolling(window=50).mean()
+        df_ma200 = df.rolling(window=200).mean()
+        delta = df.diff()
+        gain = delta.clip(lower=0)
+        loss = -delta.clip(upper=0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
 
-    fig_sma = go.Figure()
-    fig_sma.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
-    fig_sma.add_trace(go.Scatter(x=sma_20.index, y=sma_20, name="SMA 20"))
-    fig_sma.add_trace(go.Scatter(x=sma_50.index, y=sma_50, name="SMA 50"))
-    fig_sma.update_layout(template=plotly_theme)
-    st.plotly_chart(fig_sma, use_container_width=True)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df.index, y=df, name="Precio"))
+        fig.add_trace(go.Scatter(x=df_ma50.index, y=df_ma50, name="MA50"))
+        fig.add_trace(go.Scatter(x=df_ma200.index, y=df_ma200, name="MA200"))
+        fig.update_layout(title=f"{t} - Medias móviles", template=plotly_theme)
+        st.plotly_chart(fig, use_container_width=True)
 
-    st.line_chart(rsi, use_container_width=True)
+        fig2 = go.Figure()
+        fig2.add_trace(go.Scatter(x=rsi.index, y=rsi, name="RSI"))
+        fig2.update_layout(title=f"{t} - RSI", template=plotly_theme, yaxis=dict(range=[0, 100]))
+        st.plotly_chart(fig2, use_container_width=True)
 
-    fig_macd = go.Figure()
-    fig_macd.add_trace(go.Scatter(x=macd.index, y=macd, name="MACD"))
-    fig_macd.add_trace(go.Scatter(x=signal.index, y=signal, name="Señal"))
-    fig_macd.update_layout(template=plotly_theme)
-    st.plotly_chart(fig_macd, use_container_width=True)
-
-    fig_boll = go.Figure()
-    fig_boll.add_trace(go.Scatter(x=td.index, y=td, name="Precio"))
-    fig_boll.add_trace(go.Scatter(x=upper.index, y=upper, name="Banda superior"))
-    fig_boll.add_trace(go.Scatter(x=lower.index, y=lower, name="Banda inferior"))
-    fig_boll.update_layout(template=plotly_theme)
-    st.plotly_chart(fig_boll, use_container_width=True)
-
-    st.download_button("📥 Descargar datos", data.to_csv().encode(), file_name="datos.csv", mime="text/csv")
-
-# 📘 TAB 5 - Explicaciones
+# 📘 TAB 5 - Explicaciones educativas
 with tab5:
-    st.markdown("## 📘 Análisis y conclusiones")
+    st.markdown("## 📘 Explicaciones educativas")
+    st.info("🧠 Este comparador se creó con fines educativos. Los indicadores financieros como el PER, la volatilidad o el RSI pueden ayudarte a tomar decisiones más informadas, pero no garantizan resultados.")
+    st.markdown("""
+    **¿Cómo interpretar algunas métricas?**
 
-    st.markdown("### 📈 Precios históricos")
-    st.write("El gráfico permite visualizar la evolución temporal de cada activo. Tendencias sostenidas reflejan crecimiento estructural; caídas bruscas indican correcciones o eventos externos.")
+    - **PER (Price to Earnings Ratio)**: indica cuántas veces los beneficios están reflejados en el precio actual. Un PER bajo puede significar infravaloración.
+    - **Dividend Yield**: porcentaje de retorno por dividendos. Interesante para inversores que buscan ingresos pasivos.
+    - **Sharpe Ratio**: mide el rendimiento ajustado por riesgo. Cuanto más alto, mejor.
+    - **RSI (Relative Strength Index)**: indica si el activo está sobrecomprado (>70) o sobrevendido (<30).
 
-    st.markdown("### 📚 Indicadores fundamentales")
-    st.write("""
-    **🔎 PER (Price-to-Earnings Ratio):** Mide cuántas veces el beneficio anual está incluido en el precio de la acción. Un PER bajo (<15) puede indicar que está infravalorada, aunque depende del sector.
-
-    **💰 Dividend Yield (%):** Representa el retorno anual que un inversor obtiene por los dividendos, respecto al precio de la acción. Ideal para perfiles conservadores que buscan ingresos pasivos.
-
-    **📈 ROE (Return on Equity):** Muestra qué tan eficientemente una empresa utiliza el dinero de los accionistas para generar beneficios. Un ROE alto (>15%) indica buena gestión y rentabilidad.
-
-    **📊 Margen neto (%):** Proporción de ingresos que queda como beneficio final. Un margen alto muestra eficiencia operativa y control de costes.
-
-    Estas métricas permiten comparar empresas en cuanto a rentabilidad, riesgo y potencial de crecimiento.
+    Recuerda siempre complementar tus análisis con contexto económico, análisis cualitativos y tus propios criterios. 📚
     """)
 
-# 💬 Chat Educativo Financiero (GPT)
-client = openai.OpenAI(api_key="TU_API_KEY")  # ← Reemplaza con tu clave real
 
-def consulta_chatbot(pregunta):
-    chat_response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": pregunta}]
-    )
-    return chat_response.choices[0].message.content
-
-st.markdown("---")
-st.markdown("## 💬 Chat educativo sobre finanzas y análisis técnico")
-user_question = st.text_input("Escribe tu pregunta financiera o sobre inversión:")
-
-if user_question:
-    try:
-        respuesta = consulta_chatbot(user_question)
-        st.info(respuesta)
-    except Exception:
-        st.error("❌ Ocurrió un error al conectar con el chatbot. Verifica tu clave API o conexión.")
 
 
 
