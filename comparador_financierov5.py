@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import openai
 
-# 🛠️ Configuración general
+# ⚙️ Configuración general
 st.set_page_config(layout="wide", page_title="FinAnalyzer EDU", page_icon="📊")
 
 # 🎨 Encabezado institucional
@@ -27,11 +27,9 @@ with col2:
     start_date = st.date_input("📅 Fecha de inicio", pd.to_datetime("2020-01-01"))
 with col3:
     end_date = st.date_input("📅 Fecha de fin", pd.to_datetime("2027-01-01"))
-
 theme = st.selectbox("🎨 Tema visual", ["Claro", "Oscuro"])
 plotly_theme = "plotly_white" if theme == "Claro" else "plotly_dark"
 colors = px.colors.qualitative.Set1
-
 if "SPY" not in tickers:
     tickers.append("SPY")
 
@@ -55,32 +53,30 @@ with tab1:
 with tab2:
     st.markdown("## 📚 Información fundamental")
     fundamentals = {}
-
     for t in tickers:
         try:
             info = yf.Ticker(t).fast_info
             fundamentals[t] = {
-                "Nombre": t,
+                "Ticker": t,
                 "Precio actual": info.get("last_price"),
                 "PER": info.get("pe_ratio"),
-                "Dividend (%)": info.get("dividend_rate") or None,
+                "Dividend (%)": info.get("dividend_rate"),
                 "ROE (%)": None,
                 "Margen (%)": None
             }
         except Exception:
             fundamentals[t] = {
-                "Nombre": t,
+                "Ticker": t,
                 "Precio actual": "Error",
                 "PER": "Error",
                 "Dividend (%)": "Error",
                 "ROE (%)": "Error",
                 "Margen (%)": "Error"
             }
-
     df = pd.DataFrame(fundamentals).T
     st.dataframe(df)
     metric = st.selectbox("📊 Comparar métrica", df.columns[1:])
-    fig = px.bar(df.reset_index(), x="index", y=metric, color="index", template=plotly_theme)
+    fig = px.bar(df.reset_index().rename(columns={"index": "Ticker"}), x="Ticker", y=metric, color="Ticker", template=plotly_theme)
     st.plotly_chart(fig, use_container_width=True)
 
 # 📊 TAB 3 - Métricas financieras
@@ -94,7 +90,7 @@ with tab3:
     }).dropna()
     st.dataframe(metrics_df)
     chart_type = st.selectbox("📊 Mostrar gráfico", ["Sharpe Ratio", "Volatilidad"])
-    fig = px.bar(metrics_df.reset_index(), x="index", y=chart_type, color="index", template=plotly_theme)
+    fig = px.bar(metrics_df.reset_index().rename(columns={"index": "Ticker"}), x="Ticker", y=chart_type, color="Ticker", template=plotly_theme)
     st.plotly_chart(fig, use_container_width=True)
 
 # 📉 TAB 4 - Indicadores técnicos
@@ -129,15 +125,15 @@ with tab5:
     st.markdown("## 📘 Explicaciones educativas")
     st.info("🧠 Este comparador se creó con fines educativos. Los indicadores financieros como el PER, la volatilidad o el RSI pueden ayudarte a tomar decisiones más informadas, pero no garantizan resultados.")
     st.markdown("""
-    **¿Cómo interpretar algunas métricas?**
+**¿Cómo interpretar algunas métricas?**
+- **PER (Price to Earnings Ratio)**: indica cuántas veces los beneficios están reflejados en el precio actual.
+- **Dividend Yield**: porcentaje de retorno por dividendos. Interesante para ingresos pasivos.
+- **Sharpe Ratio**: mide el rendimiento ajustado por riesgo. Cuanto más alto, mejor.
+- **RSI (Relative Strength Index)**: indica si el activo está sobrecomprado (>70) o sobrevendido (<30).
 
-    - **PER (Price to Earnings Ratio)**: indica cuántas veces los beneficios están reflejados en el precio actual. Un PER bajo puede significar infravaloración.
-    - **Dividend Yield**: porcentaje de retorno por dividendos. Interesante para inversores que buscan ingresos pasivos.
-    - **Sharpe Ratio**: mide el rendimiento ajustado por riesgo. Cuanto más alto, mejor.
-    - **RSI (Relative Strength Index)**: indica si el activo está sobrecomprado (>70) o sobrevendido (<30).
+Recuerda complementar tus análisis con contexto económico, análisis cualitativos y tus propios criterios. 📘
+""")
 
-    Recuerda siempre complementar tus análisis con contexto económico, análisis cualitativos y tus propios criterios. 📚
-    """)
 
 
 
